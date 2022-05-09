@@ -1,8 +1,9 @@
 package com.jwald.billingplatform.customer;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jwald.billingplatform.subscription.Subscription;
+
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -10,6 +11,11 @@ public class Customer {
     @Id
     @GeneratedValue
     private Long id;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "customer", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("customer")
+    private Subscription subscription;
+
 
     public Customer() {
     }
@@ -20,6 +26,14 @@ public class Customer {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Subscription getSubscription() {
+        return subscription;
+    }
+
+    public void setSubscription(Subscription subscription) {
+        this.subscription = subscription;
     }
 
     @Override

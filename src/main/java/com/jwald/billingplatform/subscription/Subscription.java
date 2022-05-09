@@ -1,8 +1,9 @@
 package com.jwald.billingplatform.subscription;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jwald.billingplatform.customer.Customer;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -11,14 +12,16 @@ public class Subscription {
     @Id
     @GeneratedValue
     private Long id;
-    private Long customer_id;
     private BigDecimal dailyRate;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="fk_customer")
+    private Customer customer;
 
     public Subscription() {
     }
 
-    public Subscription(Long customer_id, BigDecimal dailyRate) {
-        this.customer_id = customer_id;
+    public Subscription(BigDecimal dailyRate) {
         this.dailyRate = dailyRate;
     }
 
@@ -30,14 +33,6 @@ public class Subscription {
         this.id = id;
     }
 
-    public Long getCustomer_id() {
-        return customer_id;
-    }
-
-    public void setCustomer_id(Long customer_id) {
-        this.customer_id = customer_id;
-    }
-
     public BigDecimal getDailyRate() {
         return dailyRate;
     }
@@ -46,25 +41,33 @@ public class Subscription {
         this.dailyRate = dailyRate;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Subscription that = (Subscription) o;
-        return Objects.equals(id, that.id) && Objects.equals(customer_id, that.customer_id) && Objects.equals(dailyRate, that.dailyRate);
+        return Objects.equals(id, that.id) && Objects.equals(dailyRate, that.dailyRate) && Objects.equals(customer, that.customer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, customer_id, dailyRate);
+        return Objects.hash(id, dailyRate, customer);
     }
 
     @Override
     public String toString() {
         return "Subscription{" +
                 "id=" + id +
-                ", customer_id=" + customer_id +
                 ", dailyRate=" + dailyRate +
+                ", customer=" + customer +
                 '}';
     }
 }

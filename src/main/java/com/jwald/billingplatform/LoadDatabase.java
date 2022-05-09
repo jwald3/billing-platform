@@ -29,15 +29,31 @@ public class LoadDatabase {
 
             userRepository.findAll().forEach(user -> log.info("Preloaded " + user));
 
-            subscriptionRepository.save(new Subscription(1L, BigDecimal.valueOf(2.49)));
-            subscriptionRepository.save(new Subscription(2L, BigDecimal.valueOf(3.99)));
-            subscriptionRepository.save(new Subscription(3L, BigDecimal.valueOf(1.99)));
+            Subscription sub1 = new Subscription(BigDecimal.valueOf(2.49));
+            Subscription sub2 = new Subscription(BigDecimal.valueOf(3.99));
+            Subscription sub3 = new Subscription(BigDecimal.valueOf(1.99));
+
+            Customer customer1 = new Customer();
+            Customer customer2 = new Customer();
+            Customer customer3 = new Customer();
+
+            sub1.setCustomer(customer1);
+            sub2.setCustomer(customer2);
+            sub3.setCustomer(customer3);
+
+            customer1.setSubscription(sub1);
+            customer2.setSubscription(sub2);
+            customer3.setSubscription(sub3);
+
+            subscriptionRepository.save(sub1);
+            subscriptionRepository.save(sub2);
+            subscriptionRepository.save(sub3);
 
             subscriptionRepository.findAll().forEach(sub -> log.info("Preloaded " + sub));
 
-            customerRepository.save(new Customer());
-            customerRepository.save(new Customer());
-            customerRepository.save(new Customer());
+            customerRepository.save(customer1);
+            customerRepository.save(customer2);
+            customerRepository.save(customer3);
 
             customerRepository.findAll().forEach(customer -> log.info("Preloaded " + customer));
         };

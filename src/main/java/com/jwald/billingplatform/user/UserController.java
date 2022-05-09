@@ -5,6 +5,8 @@ import com.jwald.billingplatform.subscription.SubscriptionController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,8 +36,12 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public User createNewUser(@RequestBody User newUser) {
-        return userRepository.save(newUser);
+    public ResponseEntity<EntityModel<User>> newUser(@RequestBody User user) {
+        User newUser = userRepository.save(user);
+
+        return ResponseEntity
+                .created(linkTo(methodOn(UserController.class).getUserById(newUser.getId())).toUri())
+                .body(userModelAssembler.toModel(newUser));
     }
 
     @GetMapping("/users/{id}")
@@ -44,5 +50,33 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("User not found with the id " + id));
 
         return userModelAssembler.toModel(user);
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long id) {
+        User updatedUser = userRepository.findById(id)
+                .map(user -> {
+                    user.setName(newUser.getName());
+                    user.setSubscriptionStart(newUser.getSubscriptionStart());
+                    user.setSubscriptionEnd(newUser.getSubscriptionEnd());
+                    return userRepository.save(user);
+                })
+                .orElseGet(() -> {
+                    newUser.setId(id);
+                    return userRepository.save(newUser);
+                });
+
+        EntityModel<User> entityModel = userModelAssembler.toModel(updatedUser);
+
+        return ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
