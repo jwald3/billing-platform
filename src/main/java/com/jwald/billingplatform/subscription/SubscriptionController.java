@@ -36,6 +36,15 @@ public class SubscriptionController {
         );
     }
 
+    @PostMapping("/subscriptions")
+    public ResponseEntity<EntityModel<Subscription>> newSubscription(@RequestBody Subscription subscription) {
+        Subscription newSubscription = subscriptionRepository.save(subscription);
+
+        return ResponseEntity
+                .created(linkTo(methodOn(SubscriptionController.class).getSubscriptionById(newSubscription.getId())).toUri())
+                .body(subscriptionModelAssembler.toModel(newSubscription));
+    }
+
     @GetMapping("/subscriptions/{id}")
     public EntityModel<Subscription> getSubscriptionById(@PathVariable Long id) {
 
