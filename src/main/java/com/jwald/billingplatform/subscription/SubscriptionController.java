@@ -5,9 +5,9 @@ import com.jwald.billingplatform.user.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,5 +43,31 @@ public class SubscriptionController {
                 orElseThrow(() -> new RuntimeException("Subscription not found with the id " + id));
 
         return subscriptionModelAssembler.toModel(subscription);
+    }
+
+    @PutMapping("/subscriptions/{id}")
+    ResponseEntity<?> replaceSubscription(@RequestBody Subscription newSubscription, @PathVariable Long id) {
+        Subscription updatedSubscription = subscriptionRepository.findById(id)
+                .map(subscription -> {
+                    subscription.setDailyRate(newSubscription.getDailyRate());
+                    return subscriptionRepository.save(subscription);
+                })
+                .orElseGet(() -> {
+                    newSubscription.setId(id);
+                    return subscriptionRepository.save(newSubscription);
+                });
+
+        EntityModel<Subscription> entityModel = subscriptionModelAssembler.toModel(updatedSubscription);
+
+        return ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
+    }
+
+    @DeleteMapping("/subscriptions/{id}")
+    public ResponseEntity<?> deleteSubscription(@PathVariable Long id) {
+        subscriptionRepository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
