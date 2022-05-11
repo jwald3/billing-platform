@@ -14,8 +14,9 @@ public class Subscription {
     private Long id;
     private BigDecimal dailyRate;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "subscription")
     @JoinColumn(name="fk_customer")
+    @JsonIgnoreProperties("subscription")
     private Customer customer;
 
     public Subscription() {
@@ -67,7 +68,6 @@ public class Subscription {
         return "Subscription{" +
                 "id=" + id +
                 ", dailyRate=" + dailyRate +
-                ", customer=" + customer +
                 '}';
     }
 }

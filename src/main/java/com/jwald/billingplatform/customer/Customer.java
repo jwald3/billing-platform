@@ -11,13 +11,19 @@ public class Customer {
     @Id
     @GeneratedValue
     private Long id;
+    private String name;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "customer", fetch = FetchType.LAZY)
+    @OneToOne
+    @JoinColumn(name="subscription_id", nullable = true)
     @JsonIgnoreProperties("customer")
     private Subscription subscription;
 
 
     public Customer() {
+    }
+
+    public Customer(String name) {
+        this.name = name;
     }
 
     public Long getId() {
@@ -26,6 +32,14 @@ public class Customer {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Subscription getSubscription() {
@@ -41,18 +55,19 @@ public class Customer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id);
+        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) && Objects.equals(subscription, customer.subscription);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name, subscription);
     }
 
     @Override
     public String toString() {
         return "Customer{" +
                 "id=" + id +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

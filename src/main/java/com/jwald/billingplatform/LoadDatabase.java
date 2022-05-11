@@ -32,10 +32,11 @@ public class LoadDatabase {
             Subscription sub1 = new Subscription(BigDecimal.valueOf(2.49));
             Subscription sub2 = new Subscription(BigDecimal.valueOf(3.99));
             Subscription sub3 = new Subscription(BigDecimal.valueOf(1.99));
+            Subscription sub4 = new Subscription(BigDecimal.valueOf(4.99));
 
-            Customer customer1 = new Customer();
-            Customer customer2 = new Customer();
-            Customer customer3 = new Customer();
+            Customer customer1 = new Customer("Customer One");
+            Customer customer2 = new Customer("Customer Two");
+            Customer customer3 = new Customer("Customer Three");
 
             sub1.setCustomer(customer1);
             sub2.setCustomer(customer2);
@@ -48,6 +49,7 @@ public class LoadDatabase {
             subscriptionRepository.save(sub1);
             subscriptionRepository.save(sub2);
             subscriptionRepository.save(sub3);
+            subscriptionRepository.save(sub4);
 
             subscriptionRepository.findAll().forEach(sub -> log.info("Preloaded " + sub));
 

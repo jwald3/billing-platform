@@ -5,9 +5,8 @@ import com.jwald.billingplatform.user.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +32,15 @@ public class CustomerController {
                 linkTo(methodOn(SubscriptionController.class).getAllSubscriptions()).withRel("subscriptions"),
                 linkTo(methodOn(UserController.class).listAllUsers()).withRel("users")
                 );
+    }
+
+    @PostMapping("/customers")
+    public ResponseEntity<EntityModel<Customer>> createNewCustomer(@RequestBody Customer customer) {
+        Customer newCustomer = customerRepository.save(customer);
+
+        return ResponseEntity
+                .created(linkTo(methodOn(CustomerController.class).getCustomerById(newCustomer.getId())).toUri())
+                .body(customerModelAssembler.toModel(newCustomer));
     }
 
     @GetMapping("/customers/{id}")
