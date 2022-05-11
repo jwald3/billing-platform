@@ -5,6 +5,7 @@ import com.jwald.billingplatform.user.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,5 +50,32 @@ public class CustomerController {
                 .orElseThrow(() -> new RuntimeException("Customer not found with the id " + id));
 
         return customerModelAssembler.toModel(customer);
+    }
+
+    @PutMapping("/customers/{id}")
+    public ResponseEntity<?> replaceCustomer(@RequestBody Customer newCustomer, @PathVariable Long id) {
+        Customer updatedCustomer = customerRepository.findById(id)
+                .map(customer -> {
+                    customer.setName(newCustomer.getName());
+                    return customerRepository.save(customer);
+                })
+                .orElseGet(() -> {
+                    newCustomer.setId(id);
+                    return customerRepository.save(newCustomer);
+                });
+
+        EntityModel<Customer> entityModel = customerModelAssembler.toModel(updatedCustomer);
+
+        return ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
+    }
+
+
+    @DeleteMapping("/customers/{id}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
+        customerRepository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
